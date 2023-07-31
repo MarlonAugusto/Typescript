@@ -12,6 +12,15 @@ if (form) {
     "Não foi possível inicializar a aplicação. Verifique se o FORM existe."
   );
 }
+
+const botaoImporta = document.querySelector("#botao-importa");
+if (botaoImporta) {
+  botaoImporta.addEventListener("click", () => {
+    controller.importaDados();
+  });
+} else {
+  throw Error("Botão importa não foi encontrado");
+}
 //const negociacoesView = new NegociacoesView('#negociacoes-view')
 //const template = negociacoesView.template();
 //console.log(template);

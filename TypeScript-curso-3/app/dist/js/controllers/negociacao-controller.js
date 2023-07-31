@@ -10,6 +10,7 @@ import { logarTempoDeExecucao } from "../decorators/logar-tempo-de-execucao.js";
 import { DiaDaSemana } from "../enums/dias-da-semana.js";
 import { Negociacao } from "../models/negociacao.js";
 import { Negociacoes } from "../models/negociacoes.js";
+import { NegociacoesService } from "../services/negociacoes-service.js";
 import { MensagemView } from "../views/mensagem-view.js";
 import { NegociacoesView } from "../views/negociacoes-view.js";
 export class NegociacaoController {
@@ -17,19 +18,35 @@ export class NegociacaoController {
         this.negociacoes = new Negociacoes();
         this.negociacoesView = new NegociacoesView("#negociacoesView");
         this.mensagemView = new MensagemView("#mensagemView");
-        this.SABADO = 6;
-        this.DOMINGO = 0;
+        this.negociacoesService = new NegociacoesService();
         this.negociacoesView.update(this.negociacoes);
     }
     adiciona() {
         const negociacao = Negociacao.criaDe(this.inputData.value, this.inputQuantidade.value, this.inputValor.value);
         if (!this.diaUtil(negociacao.data)) {
-            this.mensagemView.update("Negociações só podem ser feitas em dias úteis.");
+            this.mensagemView
+                .update("Negociações só podem ser feitas em dias úteis.");
             return;
         }
         this.negociacoes.adiciona(negociacao);
+        console.log(`
+      Data: ${negociacao.data},
+      Quantidade: ${negociacao.quantidade},
+      Valor: ${negociacao.valor}
+    `);
+        console.log(JSON.stringify(this.negociacoes, null, 2));
         this.limparFormulario();
         this.atualizaView();
+    }
+    importaDados() {
+        this.negociacoesService
+            .obterNegociacoesDoDia()
+            .then(negociacoesDeHoje => {
+            for (let negociacao of negociacoesDeHoje) {
+                this.negociacoes.adiciona(negociacao);
+            }
+            this.negociacoesView.update(this.negociacoes);
+        });
     }
     diaUtil(data) {
         return (data.getDay() > DiaDaSemana.DOMINGO && data.getDay() < DiaDaSemana.SABADO);
