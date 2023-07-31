@@ -4,6 +4,7 @@ import { logarTempoDeExecucao } from "../decorators/logar-tempo-de-execucao.js";
 import { DiaDaSemana } from "../enums/dias-da-semana.js";
 import { Negociacao } from "../models/negociacao.js";
 import { Negociacoes } from "../models/negociacoes.js";
+import { NegociacoesService } from "../services/negociacoes-service.js";
 import { MensagemView } from "../views/mensagem-view.js";
 import { NegociacoesView } from "../views/negociacoes-view.js";
 
@@ -17,8 +18,7 @@ export class NegociacaoController {
   private negociacoes = new Negociacoes();
   private negociacoesView = new NegociacoesView("#negociacoesView");
   private mensagemView = new MensagemView("#mensagemView");
-  private SABADO = 6;
-  private DOMINGO = 0;
+  private negociacoesService = new NegociacoesService();
 
   constructor() {
     this.negociacoesView.update(this.negociacoes);
@@ -34,15 +34,27 @@ export class NegociacaoController {
     );
 
     if (!this.diaUtil(negociacao.data)) {
-      this.mensagemView.update(
-        "Negociações só podem ser feitas em dias úteis."
-      );
+      this.mensagemView
+      .update("Negociações só podem ser feitas em dias úteis.");
       return;
     }
 
     this.negociacoes.adiciona(negociacao);
+    console.log(negociacao.paraTexto())
+    console.log(this.negociacoes.paraTexto())
     this.limparFormulario();
     this.atualizaView();
+  }
+
+  public importaDados(): void {
+    this.negociacoesService
+    .obterNegociacoesDoDia()
+    .then(negociacoesDeHoje => {
+        for (let negociacao of negociacoesDeHoje) {
+          this.negociacoes.adiciona(negociacao);
+        }
+        this.negociacoesView.update(this.negociacoes);
+      });
   }
 
   private diaUtil(data: Date) {
