@@ -1,6 +1,3 @@
-import { inspect } from "../decorators/inspect.js";
-import { logarTempoDeExecucao } from "../decorators/logar-tempo-de-execucao.js";
-
 export abstract class View<T> {
   // Classe asbtrata não pode ser instancionada, somente a classe filha poderá ser instancionada
 
